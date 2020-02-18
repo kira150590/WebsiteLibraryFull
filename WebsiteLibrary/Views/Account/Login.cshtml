@@ -1,0 +1,60 @@
+﻿@model UserLoginViewModel
+
+@{
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+@section Scripts
+{
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript">$(document).ready(function () {
+            $('#cbShowPassword').click(function () {
+                var currentPassowrdFiled = $('#txtPassword');
+                var currentPassword = currentPassowrdFiled.val();
+                currentPassowrdFiled.remove();
+
+                if ($(this).is(':checked')) {
+                    $(this).before('<input type="text" id="txtPassword" value="'
+                        + currentPassword + '">');
+                }
+                else {
+                    $(this).before('<input type="password" id="txtPassword" value="'
+                        + currentPassword + '">');
+                }
+            });
+        });</script>
+}
+
+
+<div class=" w3l-login-form">
+    <h2>Đăng Nhập</h2>
+    @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+    {
+        Html.AntiForgeryToken();
+        @Html.ValidationSummary(false)
+        <div class="w3l-form-group">
+            @Html.LabelFor(x => x.Email)
+            <div class="group">
+                <i class="fas fa-user"></i>
+                @Html.TextBoxFor(x => x.Email, new { placeholder = "", @class = "form-control" })
+            </div>
+        </div>
+        <div class="w3l-form-group">
+            @Html.LabelFor(x => x.Password)
+            <div class="group">
+                <i class="fas fa-unlock"></i>
+                @Html.PasswordFor(x => x.Password, new { placeholder = "", id = "txtPassword", @class = "form-control" })
+            </div>
+        </div>
+        <div class="forgot">
+            <a href="#">Bạn Quên Password?</a>
+            <p><input type="checkbox">Remember Me</p>
+        </div>
+        <button type="submit">Đăng Nhập</button>
+    }
+    <p class=" w3l-register-p">Chưa Có Tài Khoản? <a href="@Url.Action("Register", "Account")" role="button">Đăng Ký</a></p>
+</div>
+

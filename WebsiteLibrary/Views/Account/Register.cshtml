@@ -1,0 +1,145 @@
+﻿@model UserRegistrationViewModel
+
+@{
+    Layout = "~/Views/Shared/_LayoutSignUp.cshtml";
+}
+
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+
+@section Scripts
+{
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#cbShowPassword-1').click(function () {
+                var currentPassowrdFiled = $('#txtPassword-1');
+                var currentPassword = currentPassowrdFiled.val();
+                currentPassowrdFiled.remove();
+
+                if ($(this).is(':checked')) {
+                    $(this).before('<input name="Password" type="text" id="txtPassword-1" value="'
+                        + currentPassword + '">');
+                }
+                else {
+                    $(this).before('<input name="Password" type="password" id="txtPassword-1" value="'
+                        + currentPassword + '">');
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            $('#cbShowPassword-2').click(function () {
+                var currentPassowrdFiled = $('#txtPassword-2');
+                var currentPassword = currentPassowrdFiled.val();
+                currentPassowrdFiled.remove();
+
+                if ($(this).is(':checked')) {
+                    $(this).before('<input name="ConfirmPassword" type="text" id="txtPassword-2" value="'
+                        + currentPassword + '">');
+                }
+                else {
+                    $(this).before('<input name="ConfirmPassword" type="password" id="txtPassword-2" value="'
+                        + currentPassword + '">');
+                }
+            });
+        });
+
+        var $province = $('#Province');
+        var $district = $('#District');
+
+        $province.on('change', function () {
+            var $this = $(this);
+            $.ajax({
+            url: '@Url.Action("GetDistricts", "Account")',
+                method: 'Get',
+                dataType: 'json',
+                data: {
+                provinceId: $this.find(':selected').data('id')
+                }
+            }).done(function (data) {
+                $district.find('option:not(:first)').remove();
+                var result = '';
+                data.forEach(ele => {
+                    result += `<option value="${ele.text}">${ele.text}</option>`;
+                });
+                $district.append(result);
+            })
+        });
+    </script>
+
+    <script type="text/javascript">$(document).ready(function () {
+            $(imageUpload).on('change', function () {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).next('')
+            })
+        });</script>
+
+}
+
+<div class="sub-main-w3">
+    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "col-md-4", enctype = "multipart/form-data" }))
+    {
+        Html.AntiForgeryToken();
+        @Html.ValidationSummary(false)
+
+        <div class="form-group">
+            @Html.LabelFor(x => x.Email)
+            @Html.TextBoxFor(x => x.Email, new { placeholder = "", @class = "form-control", type = "email" })
+            @Html.ValidationMessageFor(x => x.Email)
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.Password)
+            @Html.PasswordFor(x => x.Password, new { placeholder = "", id = "txtPassword-1" })
+            <input type="checkbox" id="cbShowPassword-1" />Show password
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.ConfirmPassword)
+            @Html.PasswordFor(x => x.ConfirmPassword, new { placeholder = "", id = "txtPassword-2" })
+            <input type="checkbox" id="cbShowPassword-2" />Show password
+        </div>
+        //khi sua? bang` cai' do' thi`nhu~ property owr view se~ ko bi. sua? nen anh phai ra view update lai
+        <div class="form-group">
+            @Html.LabelFor(x => x.FirstName)
+            @Html.TextBoxFor(x => x.FirstName, new { placeholder = "", @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.FirstName)
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.LastName)
+            @Html.TextBoxFor(x => x.LastName, new { placeholder = "", @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.LastName)
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.Address)
+            @Html.TextBoxFor(x => x.Address, new { placeholder = "", @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.Address)
+        </div>
+        <div class="form-group col-md-2">
+            <label for="Province">Tỉnh thành</label>
+            <select name="province" id="Province" class="form-control">
+                <option value="">--Không chọn--</option>
+                @foreach (var option in (ViewBag.Province as IEnumerable<SelectListItem>))
+                {
+                    <option data-id="@option.Value" value="@option.Text">@option.Text</option>
+                }
+            </select>
+        </div>
+        <div class="form-group col-md-2">
+            <label for="District">Quận huyện</label>
+            <select name="district" id="District" class="form-control">
+                <option value="">--Không chọn--</option>
+            </select>
+        </div>
+        <div id="imageUpload" class="form-group">
+            @Html.LabelFor(x => x.Image)
+            <input type="file" name="Image" />
+        </div>
+        <div class="form-group">(Có dấu * vui lòng điền đầy đủ thông tin)</div>
+        <div class="form-group">
+            <label class="checkbox-inline">
+                <input type="checkbox" value="true" required>I agree to the terms and conditions
+            </label>
+        </div>
+        <button type="submit" value="Create" class="btn btn-primary">Tạo Tài Khoản</button>
+    }
+</div>

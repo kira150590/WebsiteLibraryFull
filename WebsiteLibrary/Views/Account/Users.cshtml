@@ -1,0 +1,354 @@
+﻿@model UserPageViewModel
+@{
+    ViewData["Title"] = "Users List";
+    var pager = Model.Page;
+    var users = Model.Users;
+}
+
+@section Scripts
+{
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="~/js/checkbox-mylib.js"></script>
+
+    <script>
+
+        //Chọn droplist page size
+
+        var $choicePageSize = $('#dropdownlist-pageSize');
+        $choicePageSize.on('change', function () {
+            var $this = $(this);
+
+            window.location = `/Account/users?pageSize=${$this.val()}`;
+        });
+
+        //Xóa bằng ajax
+
+        var $ajaxDeleteUser = $('.ajaxDeleteUser');
+        $ajaxDeleteUser.on('click', function () {
+            var $this = $(this);
+            swal("Bạn có chắc muốn xóa không?", "Hành động này sẽ không thể nào khôi phục!", "warning", {
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonClass: "btn-warning",
+                confirmButtonText: "Đồng ý",
+                cancelButtonText: "Không xóa",
+                closeOnConfirm: false,
+                closeOnCancel: false
+            }).then((isConfirm) => {
+                if (isConfirm) {
+                    $.ajax({
+                        url: '@Url.Action("AjaxDeleteUser", "Account")',
+                        method: 'POST',
+                        dataType: 'json',
+                        data: {
+                            id: $this.data('id')
+                        }
+                    }).done(function (data) {
+                        if (data) {
+                            swal("Xóa thành công!", {
+                                button: false,
+                                type: 'success',
+                            });
+                            window.location.reload();
+                        }
+                        else {
+                            alert('Xóa thất bại!');
+                        }
+                    })
+                        .fail(function (jqXHR, textStatus, errorThrown) {
+                            alert('something wrong here');
+                        });
+                } else {
+                    swal("Đã hủy!", "Dữ liệu vẫn còn", "error");
+                }
+            });
+        });
+
+        //Chọn 1 hoặc tất cả
+
+        var $table = $('#users-table');
+        var $btnDeleteMany = $('#btnDeleteManyUser');
+
+        var $multiChecknoxesModule = MyLib.Ui.MultiCheckBoxes({
+            checkboxAllSelector: '#checkbox_all',
+            checkboxListSelector: '#users-table tbody tr td:first-child'
+        });
+
+        $multiChecknoxesModule.init();
+
+        function deleteRecord(sendData, currentNumberOfRows) {
+            if (sendData.ids.length == 0) {
+                swal('', 'Lựa Chọn Ít Nhất Một Sản Phẩm Để Thực Hiện Thao Tác Này', 'warning');
+            } else {
+                $.ajax({
+                    url: '@Url.Action("DeleteManyUser", "Account")',
+                    method: 'POST',
+                    dataType: 'json',
+                    data: sendData
+                    }).done(function () {
+                        swal(
+                            'Đã Xóa!',
+                            'Dữ Liệu Đã Được Xóa Khỏi Danh Sách.',
+                            'success'
+                        ).then(() => {
+                            window.location.reload();
+                        });
+                })
+                    .fail(function (jqXHR, textStatus, errorThrown) {
+                    swal(
+                        'Lỗi!',
+                        errorThrown,
+                        'error'
+                    );
+                });
+            }
+        }
+
+        $btnDeleteMany.on('click', function () {
+            swal({
+                title: 'Bạn có chắc không?',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Có',
+                cancelButtonText: 'Không'
+            }).then((result) => {
+                console.log(result);
+                if (result) {
+                    deleteRecord({
+                        ids: $multiChecknoxesModule.getSelectedItemValues(),
+                    }, $multiChecknoxesModule.getSelectedItemValues().length);
+                }
+            });
+        });
+
+    </script>
+}
+<div>
+    <div class="btn-group btn-group-justified col-md-offset-1">
+        <form action="/Account/users">
+            <div>
+                <!--Nút chọn PageSize-->
+                <div class="col-md-1">
+                    <select name="pageSize" class="col-1"
+                            id="dropdownlist-pageSize" style="color: #007bff; border-color: #007bff; font-size: 12px;">
+                        @{
+                            int[] pageSize = new int[] { 5, 10, 20, 30 };
+
+                            foreach (var item in pageSize)
+                            {
+                                if (Convert.ToInt32(Context.Request.Query["pageSize"]) == item)
+                                {
+                                    <option selected value="@item">@item Trang</option>
+                                }
+                                else
+                                {
+                                    <option value="@item">@item Trang</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div>
+        <div class="container">
+            <div class="row">
+                <table id="users-table" class="table table-dark table-striped">
+                    <thead>
+                        <tr>
+                            <th>
+                                Tất Cả
+                                <div class="btn-group pull-right">
+                                    <input id="checkbox_all" type="checkbox" />
+                                </div>
+                            </th>
+                            <th>STT</th>
+                            <th>
+                                @Html.ActionLink("Email", "users", "Account",
+                                          new
+                                          {
+                                              sortOrder = ViewBag.SortEmail,
+                                              currentPage = Context.Request.Query["currentPage"],
+                                              searchString = Context.Request.Query["searchString"]
+                                          })
+                            </th>
+                            <th>
+                                @Html.ActionLink("Họ", "users", "Account",
+                                     new
+                                     {
+                                         sortOrder = ViewBag.SortPhoneNumber,
+                                         currentPage = Context.Request.Query["currentPage"],
+                                         searchString = Context.Request.Query["searchString"]
+                                     })
+                            </th>
+                            <th>
+                                @Html.ActionLink("Tên", "users", "Account",
+                                     new
+                                     {
+                                         sortOrder = ViewBag.SortEmail,
+                                         currentPage = Context.Request.Query["currentPage"],
+                                         searchString = Context.Request.Query["searchString"]
+                                     })
+                            </th>
+                            <th>
+                                @Html.ActionLink("Địa Chỉ", "users", "Account",
+                                     new
+                                     {
+                                         sortOrder = ViewBag.SortAddress,
+                                         currentPage = Context.Request.Query["currentPage"],
+                                         searchString = Context.Request.Query["searchString"]
+                                     })
+                            </th>
+                            <th>
+                                @Html.ActionLink("Tỉnh", "users", "Account",
+                                     new
+                                     {
+                                         sortOrder = ViewBag.Sortprovince,
+                                         currentPage = Context.Request.Query["currentPage"],
+                                         searchString = Context.Request.Query["searchString"]
+                                     })
+                            </th>
+                            <th>
+                                <button id="btnDeleteManyUser" class="btn btn-danger ajaxDelete">
+                                    Xóa Đã Chọn
+                                </button>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < users.Count(); i++)
+                        {
+                            var user = users.ElementAtOrDefault(i);
+                            <tr>
+                                <td align="left">
+                                    <input value="@user.Id" class="customerCheck" type="checkbox" />
+                                </td>
+                                <td>@(((pager.CurrentPage - 1) * pager.PageSize) + i + 1)</td> <!--Tạo bộ đếm STT-->
+                                <td>@user.Email</td>
+                                <td>@user.FirstName</td>
+                                <td>@user.LastName</td>
+                                <td>@user.Address</td>
+                                <td>@user.Province</td>
+                                <td>
+                                    <p data-id="@user.Id" role="button" class="ajaxDeleteUser btn btn-link">Xóa</p>
+                                    ||
+                                    <a role="button" href="@Url.Action("DetailsUser", "Account", new { id = user.Id })" class="btn btn-link">Chi Tiết</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="container row form-inline">
+        <!--Phân trang bên dưới-->
+        <div class="col-md-6 col-md-offset-6" style="font-size: 15px;">
+            <ul class="pagination">
+
+                <!--Tạo nút first-->
+                <li class="page-item @(pager.CurrentPage == 1 ? "disabled" : string.Empty)">
+                    <a class="page-link" href="@Url.Action("users", "Account",
+                    new
+                    {
+                        currentPage = 1,
+                        sortOrder = Context.Request.Query["sortOrder"],
+                        pageSize = Context.Request.Query["pageSize"],
+                        category = Context.Request.Query["category"],
+                        searchString = Context.Request.Query["searchString"]
+                    })">
+                        First
+                    </a>
+                </li>
+
+                <!--Tạo nút Previous-->
+                @if (pager.CurrentPage == 1)
+                {
+                    <li class="page-item disabled">
+                        <a class="page-link">Previous</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("users", "Account",
+                        new {
+                            currentPage = pager.CurrentPage - 1,
+                            sortOrder = Context.Request.Query["sortOrder"],
+                            pageSize = Context.Request.Query["pageSize"],
+                            category = Context.Request.Query["category"],
+                            searchString = Context.Request.Query["searchString"]
+                        })">Previous</a>
+                    </li>
+                }
+
+                @for (int i = pager.StartPage; i <= pager.EndPage; i++)
+                {
+                    <li class="page-item @(pager.CurrentPage == i ? "active" : string.Empty)">
+                        <a class="page-link"
+                           href="@Url.Action("users", "Account",
+                            new {
+                                currentPage = i,
+                                sortOrder = Context.Request.Query["sortOrder"],
+                                pageSize = Context.Request.Query["pageSize"],
+                                category = Context.Request.Query["category"],
+                                searchString = Context.Request.Query["searchString"]
+                            })">@i</a>
+                        </li>
+                    }
+
+                <!--Tạo nút next-->
+                @if (pager.CurrentPage == pager.TotalPages || pager.TotalPages == 1 || pager.TotalPages == 0)
+                {
+                    <li class="page-item disabled">
+                        <a class="page-link">Next</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="@Url.Action("users", "Account",
+                            new {
+                                currentPage = pager.CurrentPage + 1,
+                                sortOrder = Context.Request.Query["sortOrder"],
+                                pageSize = Context.Request.Query["pageSize"],
+                                category = Context.Request.Query["category"],
+                                searchString = Context.Request.Query["searchString"]
+                            })">
+                            Next
+                        </a>
+                    </li>
+                }
+
+                <!--Tạo nút Last-->
+                @if (pager.TotalPages == 1 || pager.TotalPages == 0)
+                {
+                    <li class="page-item disabled">
+                        <a class="page-link">Last</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item @(pager.CurrentPage == pager.TotalPages ? "disabled" : string.Empty)">
+                        <a class="page-link" href="@Url.Action("users", "Account",
+                    new
+                    {
+                        currentPage = pager.TotalPages,
+                        sortOrder = Context.Request.Query["sortOrder"],
+                        pageSize = Context.Request.Query["pageSize"],
+                        category = Context.Request.Query["category"],
+                        searchString = Context.Request.Query["searchString"]
+                    })">
+                            Last
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
