@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -39,10 +40,12 @@ namespace WebsiteLibrary.Controllers
             _webHostingEnvironment = webHostingEnvironment;
         }
 
-        [Authorize]
+        //[Authorize(Roles = "Administrator")]
         public IActionResult Users(string searchString, string sortOrder, int currentPage = 1, int pageSize = 5)
         {
-
+            bool a = User.IsInRole("User");
+            bool b = User.IsInRole("Administrator");
+            bool c = User.IsInRole("Visitor");
             #region search
 
             IQueryable<User> users = _dbContext.Users;
@@ -263,9 +266,9 @@ namespace WebsiteLibrary.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DetailsUser(string id, DetailsUserViewModel detailsUser)
+        public async Task<IActionResult> DetailsUser(string id, DetailsUserViewModel detailsUser)
         {
-            var user = _dbContext.Users.Find(detailsUser.Id);
+            var user = await _dbContext.Users.FindAsync(detailsUser.Id);
 
             if (user == null)
             {
@@ -340,11 +343,26 @@ namespace WebsiteLibrary.Controllers
             }
 
             var user = _mapper.Map<User>(userModel);
-            user.UserName = user.Email.Split('@')[0];
-            
+
+            //lấy phần trước của Email làm userName login
+            //user.UserName = user.Email.Split('@')[0];
+            //anh dang lam` dang nhap = email roi, cai nay` phai? config lai. cơ mà em quên config sao rồi :))
+            //hm, h sao ta
+            //tạm thời lấy phần trc của email = user name nhé anh
             var result = await _userManager.CreateAsync(user, userModel.Password);
             if (!result.Succeeded)
             {
+                ViewBag.Province = _dbContext.Provinces.Select(x => new SelectListItem
+                {
+                    Text = x.Name,
+                    Value = x.Id.ToString()
+                }).ToList();
+
+                //à vs lại, case not success của anh đang lỗi, vì thiếu ViewBag đoạn đó
+                //phải có ở trc mấy chỗ return lại trang view cũ nếu ko sẽ bị lỗi
+                //tát nhiên là có cách cho đỡ viết nhiều quá như vậy
+                //cơ mà chừng nào trình advance rồi thì em chỉ cho :))
+
                 foreach (var error in result.Errors)
                 {
                     ModelState.TryAddModelError(error.Code, error.Description);
@@ -367,10 +385,15 @@ namespace WebsiteLibrary.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login(string returnUrl = null)
+        public async Task<IActionResult> Login(string returnUrl)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
+            UserLoginViewModel model = new UserLoginViewModel
+            {
+                ReturnUrl = returnUrl,
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+            };
+
+            return View(model);
         }
 
         [HttpPost]
@@ -383,6 +406,7 @@ namespace WebsiteLibrary.Controllers
             }
 
             var result = await _signInManager.PasswordSignInAsync(userModel.Email, userModel.Password, userModel.RememberMe, false);
+
             if (result.Succeeded)
             {
                 return RedirectToLocal(returnUrl);
@@ -397,7 +421,8 @@ namespace WebsiteLibrary.Controllers
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
+            //await _signInManager.SignOutAsync();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
@@ -414,6 +439,84 @@ namespace WebsiteLibrary.Controllers
             }
         }
 
+        #endregion
+
+        #region Login with FB, GG
+        [AllowAnonymous]
+        [HttpPost]
+        public IActionResult ExternalLogin(string provider, string returnUrl)
+        {
+            var redirectUrl = Url.Action("ExternalLoginCallback", "Account",
+                                    new { ReturnUrl = returnUrl });
+
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+
+            return new ChallengeResult(provider, properties);
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
+        {
+            returnUrl ??= Url.Content("~/");
+
+            UserLoginViewModel userLoginViewModel = new UserLoginViewModel
+            {
+                ReturnUrl = returnUrl,
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+            };
+
+            if (remoteError != null)
+            {
+                ModelState.AddModelError(string.Empty, $"Lỗi từ nick đăng nhập Fb hoặc Google: {remoteError}");
+
+                return View("Login", userLoginViewModel);
+            }
+
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+
+            if (info == null)
+            {
+                ModelState.AddModelError(string.Empty, "Không tải được thông tin đăng nhập");
+
+                return View("Login", userLoginViewModel);
+            }
+            
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider,
+                                        info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+
+            if (signInResult.Succeeded)
+            {
+                return LocalRedirect(returnUrl);
+            }
+            else
+            {
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                if (email != null)
+                {
+                    var user = await _userManager.FindByEmailAsync(email);
+                    if (user == null)
+                    {
+
+                        user = new User
+                        {
+                            UserName = info.Principal.FindFirstValue(ClaimTypes.Email),
+                            Email = info.Principal.FindFirstValue(ClaimTypes.Email)
+                        };
+
+                        await _userManager.CreateAsync(user);
+                    }
+
+                    await _userManager.AddLoginAsync(user, info);
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+
+                    return LocalRedirect(returnUrl);
+                }
+                ViewBag.ErrorTitle = $"Email claim not received from: {info.LoginProvider}";
+                ViewBag.ErrorMessage = "Please contact support";
+
+                return View("Error");
+            }
+        }
         #endregion
 
     }

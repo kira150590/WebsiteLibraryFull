@@ -3,12 +3,15 @@
 {
     <style>
 
+
         div {
             font-size: 16px;
             color: #007bff;
         }
     </style>
 }
+
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
 @using (Html.BeginForm("detailsBook", "book", new { id = Model.Id }, FormMethod.Post, true, new { @class = "col-md-4" }))
 {

@@ -3,12 +3,15 @@
 {
     <style>
 
+
         div {
             font-size: 16px;
             color: #007bff;
         }
     </style>
 }
+
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
 @section Scripts
 {

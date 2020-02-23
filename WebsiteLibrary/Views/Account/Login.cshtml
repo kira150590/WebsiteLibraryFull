@@ -6,6 +6,13 @@
 
 @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
+@section Styles
+{
+    h1{
+    text-align: center;
+    }
+}
+
 @section Scripts
 {
 
@@ -28,33 +35,65 @@
         });</script>
 }
 
-
 <div class=" w3l-login-form">
-    <h2>Đăng Nhập</h2>
-    @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+    @if (User.Identity.IsAuthenticated)
     {
-        Html.AntiForgeryToken();
-        @Html.ValidationSummary(false)
-        <div class="w3l-form-group">
-            @Html.LabelFor(x => x.Email)
-            <div class="group">
-                <i class="fas fa-user"></i>
-                @Html.TextBoxFor(x => x.Email, new { placeholder = "", @class = "form-control" })
-            </div>
-        </div>
-        <div class="w3l-form-group">
-            @Html.LabelFor(x => x.Password)
-            <div class="group">
-                <i class="fas fa-unlock"></i>
-                @Html.PasswordFor(x => x.Password, new { placeholder = "", id = "txtPassword", @class = "form-control" })
-            </div>
-        </div>
-        <div class="forgot">
-            <a href="#">Bạn Quên Password?</a>
-            <p><input type="checkbox">Remember Me</p>
-        </div>
-        <button type="submit">Đăng Nhập</button>
+        <h2>
+            <a class="nav-link text-dark" title="Welcome">Xin Chào @User.Identity.Name!</a><hr />
+            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index"
+               title="Welcome">Ấn vào đây để trở về trang chủ</a>
+        </h2>
     }
-    <p class=" w3l-register-p">Chưa Có Tài Khoản? <a href="@Url.Action("Register", "Account")" role="button">Đăng Ký</a></p>
+    else
+    {
+        <h2>Đăng Nhập</h2>
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+        {
+            Html.AntiForgeryToken();
+            @Html.ValidationSummary(false)
+            <div class="w3l-form-group">
+                @Html.LabelFor(x => x.Email)
+                <div class="group">
+                    <i class="fas fa-user"></i>
+                    @Html.TextBoxFor(x => x.Email, new { placeholder = "", @class = "form-control" })
+                </div>
+            </div>
+            <div class="w3l-form-group">
+                @Html.LabelFor(x => x.Password)
+                <div class="group">
+                    <i class="fas fa-unlock"></i>
+                    @Html.PasswordFor(x => x.Password, new { placeholder = "", id = "txtPassword", @class = "form-control" })
+                </div>
+            </div>
+            <div class="forgot">
+                <a href="#">Bạn Quên Password?</a>
+                <p><input asp-for="RememberMe" type="checkbox">Remember Me</p>
+            </div>
+            <button type="submit">Đăng Nhập</button>
+        }
+        <p class=" w3l-register-p">Chưa Có Tài Khoản? <a href="@Url.Action("Register", "Account")" role="button">Đăng Ký</a></p>
+        <div class="btn btn-primary col-sm-4">
+            @{
+                if (Model.ExternalLogins.Count == 0)
+                {
+                    <div>No external logins configured</div>
+                }
+                else
+                {
+                    <form method="post" asp-action="ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
+                        <div>
+                            @foreach (var provider in Model.ExternalLogins)
+                            {
+                                <button type="submit" name="provider" value="@provider.Name"
+                                        title="Đăng nhập với tài khoản @provider.DisplayName">
+                                    @provider.DisplayName<hr />
+                                </button>
+                            }
+                        </div>
+                    </form>
+                }
+            }
+        </div>
+    }
 </div>
 

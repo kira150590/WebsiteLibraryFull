@@ -1,0 +1,50 @@
+﻿@model DetailsBookViewModel
+@section Styles
+{
+    <style>
+
+
+        div {
+            font-size: 16px;
+            color: #007bff;
+        }
+    </style>
+}
+
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+@using (Html.BeginForm("DetailsBookBookVisitorUser", "Home", new { id = Model.Id }, FormMethod.Post, true, new { @class = "col-md-4" }))
+{
+    @Html.HiddenFor(x => x.Id);
+    Html.AntiForgeryToken();
+
+    <div class="form-group">
+        @Html.LabelFor(x => x.NameOfBook)
+        @Html.DisplayFor(x => x.NameOfBook, new { placeholder = "", @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.Author)
+        @Html.DisplayFor(x => x.Author, new { placeholder = "", @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.Categories)
+        @Html.DropDownListFor(x => x.CategoryId, (IEnumerable<SelectListItem>)ViewBag.Categories, "Danh Mục", new { @class = "form-control", disabled = "disabled" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.YearOfPrint)
+        @Html.DisplayFor(x => x.YearOfPrint, new { placeholder = "", @class = "form-control", type = "number" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.Quantity)
+        @Html.DisplayFor(x => x.Quantity, new { placeholder = "", @class = "form-control", type = "number" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.Code)
+        @Html.DisplayFor(x => x.Code, new { placeholder = "", @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.Photo)
+        <img src="~/images/@Model.Photo" with="150" height="150" alt="#" />
+    </div>
+    @Html.ActionLink("Trở Về", "BookVisitorUser", "Home", null, new { @class = "btn btn-primary", type = "button" })
+}

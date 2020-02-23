@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Microsoft.AspNetCore.Authentication;
 using WebsiteLibrary.Models;
 
 namespace WebsiteLibrary.ViewModels
@@ -22,12 +23,18 @@ namespace WebsiteLibrary.ViewModels
         [Display(Name = "Remember me")]
         public bool RememberMe { get; set; }
 
+        public string ReturnUrl { get; set; }
+
+        // AuthenticationScheme is in Microsoft.AspNetCore.Authentication namespace
+        public List<AuthenticationScheme> ExternalLogins { get; internal set; }
+
         public static UserLoginViewModel UserLoginView(UserLoginModel userLoginView)
         {
             var a = new UserLoginViewModel();
             a.Id = userLoginView.Id;
             a.Email = userLoginView.Email;
             a.Password = userLoginView.Password;
+            a.ReturnUrl = userLoginView.ReturnUrl;
 
             return a;
         }

@@ -3,12 +3,15 @@
 {
     <style>
 
+
         div {
             font-size: 16px;
             color: #007bff;
         }
     </style>
 }
+
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
 @section Scripts
 {
@@ -25,7 +28,7 @@
 {
     @Html.HiddenFor(x => x.Id);
     Html.AntiForgeryToken();
-    @Html.ValidationSummary(false) 
+    @Html.ValidationSummary(false) //báo lỗi tổng khi người dùng ấn submit
 
     <div class="form-group">
         @Html.LabelFor(x => x.NameOfBook)
@@ -66,6 +69,6 @@
     <div>
         <button type="submit" class="btn btn-primary">Đồng Ý</button>
         @Html.ActionLink("Hủy", "Books", "Book", null,
-                        new { @class = "btn btn-primary", type = "button", style = "position: relative; right: -30px;" })
+                             new { @class = "btn btn-primary", type = "button", style = "position: relative; right: -30px;" })
     </div>
 }

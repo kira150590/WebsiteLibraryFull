@@ -28,14 +28,18 @@
                 <ul class="agile_forms">
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <li><a href="@Url.Action("Logout", "Account")" role="button"><i class="fa fa-sign-in" aria-hidden="true"></i> Đăng Xuat</a> </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index"
+                               title="Welcome">Xin Chào @User.Identity.Name!</a>
+                        </li>
+                        <li><a href="@Url.Action("Logout", "Account")" role="button"><i class="fa fa-sign-in" aria-hidden="true"></i> Đăng Xuat</a></li>
+
                     }
                     else
                     {
                         <li><a href="@Url.Action("Login", "Account")" role="button"><i class="fa fa-sign-in" aria-hidden="true"></i> Đăng Nhập</a> </li>
                         <li><a href="@Url.Action("Register", "Account")" role="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Đăng Ký</a> </li>
                     }
-
                 </ul>
                 <ul>
                     <li><i class="fa fa-phone" aria-hidden="true"></i>+(84) 123 456 789</li>
@@ -59,21 +63,69 @@
                 <div class="collapse navbar-collapse navbar-right" id="bs-example-navbar-collapse-1">
                     <nav class="menu--iris">
                         <ul class="nav navbar-nav menu__list">
-                            <li class="menu__item menu__item--current">
-                                <a class="menu__link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                            </li>
-                            <li class="menu__item">
-                                <a class="menu__link" asp-area="" asp-controller="Book" asp-action="Books">Books</a>
-                            </li>
-                            <li class="menu__item">
-                                <a class="menu__link" asp-area="" asp-controller="Account" asp-action="Users">Users</a>
-                            </li>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                if (User.IsInRole("User"))
+                                {
+                                    <li class="menu__item menu__item--current">
+                                        <a class="menu__link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                                    </li>
+                                    <li class="menu__item">
+                                        <a class="menu__link" asp-area="" asp-controller="Home" asp-action="BookVisitorUser">Books List</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="menu__item menu__item--current">
+                                        <a class="menu__link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                                    </li>
+                                    <li class="menu__item">
+                                        <a class="menu__link" asp-area="" asp-controller="Book" asp-action="Books">Books Manage</a>
+                                    </li>
+                                    <li class="menu__item">
+                                        <a class="menu__link" asp-area="" asp-controller="Account" asp-action="Users">Users Manage</a>
+                                    </li>
+                                }
+
+                            }
+                            else
+                            {
+                                <li class="menu__item menu__item--current">
+                                    <a class="menu__link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                                </li>
+                                <li class="menu__item">
+                                    <a class="menu__link" asp-area="" asp-controller="Home" asp-action="BookVisitorUser">Books List</a>
+                                </li>
+                            }
+
                         </ul>
                         <div class="w3_agileits_search">
-                            <form action="/home/books">
-                                <input type="search" name="searchString" placeholder="Search here...">
-                                <input value="@Context.Request.Query["searchString"]" type="submit">
-                            </form>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                if (User.IsInRole("User"))
+                                {
+                                    <form action="/home/BookVisitorUser">
+                                        <input type="search" name="searchString" placeholder="Search here...">
+                                        <input value="@Context.Request.Query["searchString"]" type="submit">
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form action="/Bbook/books">
+                                        <input type="search" name="searchString" placeholder="Search here...">
+                                        <input value="@Context.Request.Query["searchString"]" type="submit">
+                                    </form>
+                                }
+
+                            }
+                            else
+                            {
+                                <form action="/home/BookVisitorUser">
+                                    <input type="search" name="searchString" placeholder="Search here...">
+                                    <input value="@Context.Request.Query["searchString"]" type="submit">
+                                </form>
+                            }
+                            
                         </div>
                     </nav>
                 </div>
@@ -103,9 +155,40 @@
                             <input type="submit" value="">
                         </form>
                         <ul class="w3l_footer_nav">
-                            <li><a class="menu__link" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                            <li><a class="menu__link" asp-area="" asp-controller="Book" asp-action="Books">Books</a></li>
-                            <li><a class="menu__link" asp-area="" asp-controller="Account" asp-action="Users">Users</a></li>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                if (User.IsInRole("User"))
+                                {
+                                    <li class="menu__item menu__item--current">
+                                        <a class="menu__link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                                    </li>
+                                    <li class="menu__item">
+                                        <a class="menu__link" asp-area="" asp-controller="Home" asp-action="BookVisitorUser">Books List</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="menu__item menu__item--current">
+                                        <a class="menu__link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                                    </li>
+                                    <li class="menu__item">
+                                        <a class="menu__link" asp-area="" asp-controller="Book" asp-action="Books">Books Manage</a>
+                                    </li>
+                                    <li class="menu__item">
+                                        <a class="menu__link" asp-area="" asp-controller="Account" asp-action="Users">Users Manage</a>
+                                    </li>
+                                }
+
+                            }
+                            else
+                            {
+                                <li class="menu__item menu__item--current">
+                                    <a class="menu__link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                                </li>
+                                <li class="menu__item">
+                                    <a class="menu__link" asp-area="" asp-controller="Home" asp-action="BookVisitorUser">Books List</a>
+                                </li>
+                            }
                         </ul>
                     </div>
                     <div class="clearfix"> </div>

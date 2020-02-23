@@ -1,0 +1,277 @@
+﻿@model BookPageViewModel
+@{
+    ViewData["Title"] = "Books List";
+    var pager = Model.Page;
+    var books = Model.Books;
+    var cate = Model.Categories.ToList();
+}
+
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+@section Scripts
+{
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="~/js/checkbox-mylib.js"></script>
+
+    <script>
+        var $categories = $('#dropdownlist-category');
+
+        //kết nối đến thẻ form gần nhất
+
+        $categories.on('change', function () {
+            var $this = $(this);
+
+            $this.closest('form').submit();
+        });
+
+        //Chọn droplist
+
+        var $choicePageSize = $('#dropdownlist-pageSize');
+        $choicePageSize.on('change', function () {
+            var $this = $(this);
+
+            window.location = `/Home/BookVisitorUser?pageSize=${$this.val()}`;
+        });
+    </script>
+}
+<div>
+    <div class="btn-group btn-group-justified col-md-offset-1">
+        <form action="/Home/BookVisitorUser">
+            <div>
+                <div class="col-md-1">
+                    <select name="category" class="col-2"
+                            id="dropdownlist-category" style="color: #007bff; border-color: #007bff; font-size: 12px;">
+                        <option>Danh Mục</option>
+                        @for (int i = 0; i < cate.Count(); i++)
+                        {
+
+                            if (Context.Request.Query["category"] == cate[i].Id.ToString())
+                            {
+                                <option value="@cate[i].Id">@cate[i].CategoryName</option>
+                            }
+                            else
+                            {
+                                <option value="@cate[i].Id">@cate[i].CategoryName</option>
+                            }
+
+                        }
+                    </select>
+                </div>
+                <!--Nút chọn PageSize-->
+                <div class="col-md-1">
+                    <select name="pageSize" class="col-1"
+                            id="dropdownlist-pageSize" style="color: #007bff; border-color: #007bff; font-size: 12px;">
+                        @{
+                            int[] pageSize = new int[] { 5, 10, 20, 30 };
+
+                            foreach (var item in pageSize)
+                            {
+                                if (Convert.ToInt32(Context.Request.Query["pageSize"]) == item)
+                                {
+                                    <option selected value="@item">@item Trang</option>
+                                }
+                                else
+                                {
+                                    <option value="@item">@item Trang</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div>
+        <div class="container">
+            <div class="row">
+                <table id="Books-table" class="table table-dark table-striped">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>
+                                @Html.ActionLink("Tên Sách", "BookVisitorUser", "Home",
+                                          new
+                                          {
+                                              sortOrder = ViewBag.SortNameBook,
+                                              currentPage = Context.Request.Query["currentPage"],
+                                              searchString = Context.Request.Query["searchString"]
+                                          })
+                            </th>
+                            <th>
+                                @Html.ActionLink("Tác Giả", "BookVisitorUser", "Home",
+                                          new
+                                          {
+                                              sortOrder = ViewBag.SortAuthor,
+                                              currentPage = Context.Request.Query["currentPage"],
+                                              searchString = Context.Request.Query["searchString"]
+                                          })
+                            </th>
+                            <th>
+                                @Html.ActionLink("Thể Loại", "BookVisitorUser", "Home",
+                                          new
+                                          {
+                                              sortOrder = ViewBag.SortCategory,
+                                              currentPage = Context.Request.Query["currentPage"],
+                                              searchString = Context.Request.Query["searchString"]
+                                          })
+                            </th>
+                            <th>
+                                @Html.ActionLink("Năm Xuất Bản", "BookVisitorUser", "Home",
+                                          new
+                                          {
+                                              sortOrder = ViewBag.SortYear,
+                                              currentPage = Context.Request.Query["currentPage"],
+                                              searchString = Context.Request.Query["searchString"]
+                                          })
+                            </th>
+                            <th>
+                                @Html.ActionLink("Mã Sách", "BookVisitorUser", "Home",
+                                          new
+                                          {
+                                              sortOrder = ViewBag.SortCode,
+                                              currentPage = Context.Request.Query["currentPage"],
+                                              searchString = Context.Request.Query["searchString"]
+                                          })
+                            </th>
+                            <th>
+                                @Html.ActionLink("Số Lượng", "BookVisitorUser", "Home",
+                                          new
+                                          {
+                                              sortOrder = ViewBag.SortQuantity,
+                                              currentPage = Context.Request.Query["currentPage"],
+                                              searchString = Context.Request.Query["searchString"]
+                                          })
+                            </th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < books.Count(); i++)
+                        {
+                            var book = books.ElementAtOrDefault(i);
+                            <tr>
+                                <td>@(((pager.CurrentPage - 1) * pager.PageSize) + i + 1)</td> <!--Tạo bộ đếm STT-->
+                                <td>@book.NameOfBook</td>
+                                <td>@book.Author</td>
+                                <td>@book.CategoryName</td>
+                                <td>@book.YearOfPrint</td>
+                                <td>@book.Code</td>
+                                <td>@book.Quantity</td>
+                                <td>
+                                    <a role="button" href="@Url.Action("DetailsBookBookVisitorUser", "Home", new { id = book.Id })" class="btn btn-link">Chi Tiết</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="container row form-inline">
+        <!--Phân trang bên dưới-->
+        <div class="col-md-6 col-md-offset-6" style="font-size: 15px;">
+            <ul class="pagination">
+
+                <!--Tạo nút first-->
+                <li class="page-item @(pager.CurrentPage == 1 ? "disabled" : string.Empty)">
+                    <a class="page-link" href="@Url.Action("BookVisitorUser", "Home",
+                    new
+                    {
+                        currentPage = 1,
+                        sortOrder = Context.Request.Query["sortOrder"],
+                        pageSize = Context.Request.Query["pageSize"],
+                        category = Context.Request.Query["category"],
+                        searchString = Context.Request.Query["searchString"]
+                    })">
+                        First
+                    </a>
+                </li>
+
+                <!--Tạo nút Previous-->
+                @if (pager.CurrentPage == 1)
+                {
+                    <li class="page-item disabled">
+                        <a class="page-link">Previous</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("BookVisitorUser", "Home",
+                        new {
+                            currentPage = pager.CurrentPage - 1,
+                            sortOrder = Context.Request.Query["sortOrder"],
+                            pageSize = Context.Request.Query["pageSize"],
+                            category = Context.Request.Query["category"],
+                            searchString = Context.Request.Query["searchString"]
+                        })">Previous</a>
+                    </li>
+                }
+
+                @for (int i = pager.StartPage; i <= pager.EndPage; i++)
+                {
+                    <li class="page-item @(pager.CurrentPage == i ? "active" : string.Empty)">
+                        <a class="page-link"
+                           href="@Url.Action("BookVisitorUser", "Home",
+                            new {
+                                currentPage = i,
+                                sortOrder = Context.Request.Query["sortOrder"],
+                                pageSize = Context.Request.Query["pageSize"],
+                                category = Context.Request.Query["category"],
+                                searchString = Context.Request.Query["searchString"]
+                            })">@i</a>
+                        </li>
+                    }
+
+                <!--Tạo nút next-->
+                @if (pager.CurrentPage == pager.TotalPages || pager.TotalPages == 1 || pager.TotalPages == 0)
+                {
+                    <li class="page-item disabled">
+                        <a class="page-link">Next</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="@Url.Action("BookVisitorUser", "Home",
+                            new {
+                                currentPage = pager.CurrentPage + 1,
+                                sortOrder = Context.Request.Query["sortOrder"],
+                                pageSize = Context.Request.Query["pageSize"],
+                                category = Context.Request.Query["category"],
+                                searchString = Context.Request.Query["searchString"]
+                            })">
+                            Next
+                        </a>
+                    </li>
+                }
+
+                <!--Tạo nút Last-->
+                @if (pager.TotalPages == 1 || pager.TotalPages == 0)
+                {
+                    <li class="page-item disabled">
+                        <a class="page-link">Last</a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item @(pager.CurrentPage == pager.TotalPages ? "disabled" : string.Empty)">
+                        <a class="page-link" href="@Url.Action("BookVisitorUser", "Home",
+                    new
+                    {
+                        currentPage = pager.TotalPages,
+                        sortOrder = Context.Request.Query["sortOrder"],
+                        pageSize = Context.Request.Query["pageSize"],
+                        category = Context.Request.Query["category"],
+                        searchString = Context.Request.Query["searchString"]
+                    })">
+                            Last
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

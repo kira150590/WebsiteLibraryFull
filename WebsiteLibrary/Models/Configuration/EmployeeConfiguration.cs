@@ -9,6 +9,9 @@ namespace WebsiteLibrary.Models.Configuration
 {
     public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
     {
+        //sử dụng fluent API để cấu hình cho bảnh giữ liệu từ entity class
+        //tham khảo link: https://tuhocict.com/fluent-api-trong-code-first
+
         public void Configure(EntityTypeBuilder<Employee> builder)
         {
             builder.HasData(

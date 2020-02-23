@@ -36,10 +36,11 @@ namespace WebsiteLibrary.Controllers
             _dbContext = dbContext;
             _webHostingEnvironment = webHostingEnvironment;
         }
+
         [Authorize]
         public IActionResult Books(string searchString, string sortOrder, int? category, int currentPage = 1, int pageSize = 5)
         {
-            
+
             #region search
 
             IQueryable<Book> books = _dbContext.BooksList.Include(x => x.Category);
@@ -212,7 +213,7 @@ namespace WebsiteLibrary.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CreateBook(CreateBookViewModel createBook, IFormFile image)
+        public async Task<IActionResult> CreateBook(CreateBookViewModel createBook, IFormFile image)
         {
 
             if (_dbContext.BooksList.Any(x => x.Code == createBook.Code))
@@ -240,7 +241,7 @@ namespace WebsiteLibrary.Controllers
                 createBook.Image.CopyTo(new FileStream(filePath, FileMode.Create));
             }
 
-            _dbContext.BooksList.Add(new Book
+            await _dbContext.BooksList.AddAsync(new Book
             {
                 Code = createBook.Code,
                 Author = createBook.Author,
@@ -291,7 +292,7 @@ namespace WebsiteLibrary.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult UpdateBook(int id, UpdateBookViewModel updateBook, IFormFile image)
+        public async Task<IActionResult> UpdateBook(int id, UpdateBookViewModel updateBook, IFormFile image)
         {
             var book = _dbContext.BooksList.Find(updateBook.Id);
 
@@ -339,7 +340,7 @@ namespace WebsiteLibrary.Controllers
                 return View(updateBook);
             }
 
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
             return RedirectToAction("Books");
         }
@@ -426,9 +427,9 @@ namespace WebsiteLibrary.Controllers
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult DetailsBook(int id, DetailsBookViewModel detailsBook)
+        public async Task<IActionResult> DetailsBook(int id, DetailsBookViewModel detailsBook)
         {
-            var book = _dbContext.BooksList.Find(detailsBook.Id);
+            var book = await _dbContext.BooksList.FindAsync(detailsBook.Id);
 
             if (book == null)
             {

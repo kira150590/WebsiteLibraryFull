@@ -6,24 +6,20 @@
         @if (SignInManager.IsSignedIn(User))
         {
             <li class="nav-item">
-                <a class="nav-link text-dark" asp-controller="Home" asp-action="Index" 
+                <a class="nav-link text-dark" asp-controller="Home" asp-action="Index"
                    title="Welcome">Welcome @User.Identity.Name!</a>
             </li>
             <li class="nav-item">
-                <form class="form-inline" asp-controller="Account" asp-action="Logout">
-                    <button type="submit" class="nav-link btn btn-link text-info">Logout</button>
-                </form>
+                <a href="@Url.Action("Logout", "Account")" role="button"><i class="fa fa-sign-in" aria-hidden="true"></i> Đăng Xuat</a>
             </li>
         }
         else
         {
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-controller="Account"
-                   asp-action="Login">Login</a>
+            <li>
+                <a href="@Url.Action("Login", "Account")" role="button"><i class="fa fa-sign-in" aria-hidden="true"></i> Đăng Nhập</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-controller="Account"
-                   asp-action="Register">Register</a>
+            <li>
+                <a href="@Url.Action("Register", "Account")" role="button"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Đăng Ký</a>
             </li>
         }
     </ul>

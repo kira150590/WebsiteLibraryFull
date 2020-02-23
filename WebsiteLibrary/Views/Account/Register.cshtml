@@ -98,7 +98,6 @@
             @Html.PasswordFor(x => x.ConfirmPassword, new { placeholder = "", id = "txtPassword-2" })
             <input type="checkbox" id="cbShowPassword-2" />Show password
         </div>
-        //khi sua? bang` cai' do' thi`nhu~ property owr view se~ ko bi. sua? nen anh phai ra view update lai
         <div class="form-group">
             @Html.LabelFor(x => x.FirstName)
             @Html.TextBoxFor(x => x.FirstName, new { placeholder = "", @class = "form-control" })
@@ -114,12 +113,17 @@
             @Html.TextBoxFor(x => x.Address, new { placeholder = "", @class = "form-control" })
             @Html.ValidationMessageFor(x => x.Address)
         </div>
+        //cai nay em noi roi, model o? controler mapping vs giao dien bang thuoc tinh name, chu ko phai id, cai nay ko
+        //co name nen no ko nhan dc
         <div class="form-group col-md-2">
             <label for="Province">Tỉnh thành</label>
             <select name="province" id="Province" class="form-control">
                 <option value="">--Không chọn--</option>
                 @foreach (var option in (ViewBag.Province as IEnumerable<SelectListItem>))
                 {
+                    <!--cho nay co ve nhu anh dung id de lay data cho distrct nen ko chay dc nua
+                        a` roi, data-id nay` la` cua? option, chu ko phai cua? select, cai value thi` lai la` cua? selct
+                        -->
                     <option data-id="@option.Value" value="@option.Text">@option.Text</option>
                 }
             </select>
@@ -142,4 +146,9 @@
         </div>
         <button type="submit" value="Create" class="btn btn-primary">Tạo Tài Khoản</button>
     }
+    <div class="">
+        <button type="submit" href="@Url.Action("ExternalLoginCallback", "Account")">
+            Đăng kí Facebook
+        </button>
+    </div>
 </div>

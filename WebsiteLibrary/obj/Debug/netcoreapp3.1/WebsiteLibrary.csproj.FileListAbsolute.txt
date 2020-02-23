@@ -82,3 +82,14 @@
 /Users/admin/Desktop/Code/MVC/WebsiteLibrary/WebsiteLibrary/obj/Debug/netcoreapp3.1/Razor/Views/Account/DetailsUser.cshtml.g.cs
 /Users/admin/Desktop/Code/MVC/WebsiteLibrary/WebsiteLibrary/obj/Debug/netcoreapp3.1/Razor/Views/Account/Users.cshtml.g.cs
 /Users/admin/Desktop/Code/MVC/WebsiteLibrary/WebsiteLibrary/obj/Debug/netcoreapp3.1/Razor/Views/Account/_ValidationScriptsPartial.cshtml.g.cs
+/Users/admin/Desktop/Code/MVC/WebsiteLibrary/WebsiteLibrary/obj/Debug/netcoreapp3.1/Razor/Views/Book/_ValidationScriptsPartial.cshtml.g.cs
+/Users/admin/Desktop/Code/MVC/WebsiteLibrary/WebsiteLibrary/obj/Debug/netcoreapp3.1/Razor/Views/Home/_ValidationScriptsPartial.cshtml.g.cs
+/Users/admin/Desktop/Code/MVC/WebsiteLibrary/WebsiteLibrary/obj/Debug/netcoreapp3.1/Razor/Views/Home/BookVisitorUser.cshtml.g.cs
+/Users/admin/Desktop/Code/MVC/WebsiteLibrary/WebsiteLibrary/obj/Debug/netcoreapp3.1/Razor/Views/Home/DetailsBookBookVisitorUser.cshtml.g.cs
+/Users/admin/Desktop/Code/MVC/WebsiteLibrary/WebsiteLibrary/obj/Debug/netcoreapp3.1/Razor/Views/Shared/_ValidationScriptsPartial.cshtml.g.cs
+/Users/admin/Desktop/Code/MVC/WebsiteLibrary/WebsiteLibrary/obj/Debug/netcoreapp3.1/Razor/Views/Account/Error.cshtml.g.cs
+/Users/admin/Desktop/Code/MVC/WebsiteLibrary/WebsiteLibrary/obj/Debug/netcoreapp3.1/Razor/Views/Book/Error.cshtml.g.cs
+/Users/admin/Desktop/Code/MVC/WebsiteLibrary/WebsiteLibrary/obj/Debug/netcoreapp3.1/Razor/Views/Home/Error.cshtml.g.cs
+/Users/admin/Desktop/Code/MVC/WebsiteLibrary/WebsiteLibrary/bin/Debug/netcoreapp3.1/Microsoft.AspNetCore.Authentication.Facebook.dll
+/Users/admin/Desktop/Code/MVC/WebsiteLibrary/WebsiteLibrary/bin/Debug/netcoreapp3.1/Microsoft.AspNetCore.Authentication.Google.dll
+/Users/admin/Desktop/Code/MVC/WebsiteLibrary/WebsiteLibrary/bin/Debug/netcoreapp3.1/mono_crash.42f6ec106.1.json

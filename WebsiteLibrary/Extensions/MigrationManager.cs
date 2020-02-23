@@ -19,7 +19,7 @@ namespace WebsiteLibrary.Extensions
                     {
                         appContext.Database.Migrate();
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         //Log errors
                         throw;

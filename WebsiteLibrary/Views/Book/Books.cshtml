@@ -6,6 +6,8 @@
     var cate = Model.Categories.ToList();
 }
 
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
 @section Scripts
 {
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
@@ -200,57 +202,57 @@
                             <th>STT</th>
                             <th>
                                 @Html.ActionLink("Tên Sách", "books", "book",
-                                     new
-                                     {
-                                         sortOrder = ViewBag.SortNameBook,
-                                         currentPage = Context.Request.Query["currentPage"],
-                                         searchString = Context.Request.Query["searchString"]
-                                     })
+                                          new
+                                          {
+                                              sortOrder = ViewBag.SortNameBook,
+                                              currentPage = Context.Request.Query["currentPage"],
+                                              searchString = Context.Request.Query["searchString"]
+                                          })
                             </th>
                             <th>
                                 @Html.ActionLink("Tác Giả", "books", "book",
-                                     new
-                                     {
-                                         sortOrder = ViewBag.SortAuthor,
-                                         currentPage = Context.Request.Query["currentPage"],
-                                         searchString = Context.Request.Query["searchString"]
-                                     })
+                                          new
+                                          {
+                                              sortOrder = ViewBag.SortAuthor,
+                                              currentPage = Context.Request.Query["currentPage"],
+                                              searchString = Context.Request.Query["searchString"]
+                                          })
                             </th>
                             <th>
                                 @Html.ActionLink("Thể Loại", "books", "book",
-                                     new
-                                     {
-                                         sortOrder = ViewBag.SortCategory,
-                                         currentPage = Context.Request.Query["currentPage"],
-                                         searchString = Context.Request.Query["searchString"]
-                                     })
+                                          new
+                                          {
+                                              sortOrder = ViewBag.SortCategory,
+                                              currentPage = Context.Request.Query["currentPage"],
+                                              searchString = Context.Request.Query["searchString"]
+                                          })
                             </th>
                             <th>
                                 @Html.ActionLink("Năm Xuất Bản", "books", "book",
-                                     new
-                                     {
-                                         sortOrder = ViewBag.SortYear,
-                                         currentPage = Context.Request.Query["currentPage"],
-                                         searchString = Context.Request.Query["searchString"]
-                                     })
+                                          new
+                                          {
+                                              sortOrder = ViewBag.SortYear,
+                                              currentPage = Context.Request.Query["currentPage"],
+                                              searchString = Context.Request.Query["searchString"]
+                                          })
                             </th>
                             <th>
                                 @Html.ActionLink("Mã Sách", "books", "book",
-                                     new
-                                     {
-                                         sortOrder = ViewBag.SortCode,
-                                         currentPage = Context.Request.Query["currentPage"],
-                                         searchString = Context.Request.Query["searchString"]
-                                     })
+                                          new
+                                          {
+                                              sortOrder = ViewBag.SortCode,
+                                              currentPage = Context.Request.Query["currentPage"],
+                                              searchString = Context.Request.Query["searchString"]
+                                          })
                             </th>
                             <th>
                                 @Html.ActionLink("Số Lượng", "books", "book",
-                                     new
-                                     {
-                                         sortOrder = ViewBag.SortQuantity,
-                                         currentPage = Context.Request.Query["currentPage"],
-                                         searchString = Context.Request.Query["searchString"]
-                                     })
+                                          new
+                                          {
+                                              sortOrder = ViewBag.SortQuantity,
+                                              currentPage = Context.Request.Query["currentPage"],
+                                              searchString = Context.Request.Query["searchString"]
+                                          })
                             </th>
                             <th>
                                 <button id="btnDeleteMany" class="btn btn-danger ajaxDelete">
